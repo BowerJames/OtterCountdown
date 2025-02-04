@@ -5,6 +5,7 @@ from trl import GRPOConfig, GRPOTrainer
 from reward_functions import reward_countdown, reward_format
 from huggingface_hub import login
 from transformers import TrainingArguments
+import wandb
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train model using GRPO')
@@ -20,6 +21,10 @@ def parse_args():
                        help='Model ID for uploading to Hub')
     parser.add_argument('--hub_token', type=str, required=True,
                        help='HuggingFace token for pushing to hub')
+    parser.add_argument('--wandb_project', type=str, default="otter-countdown",
+                       help='Weights & Biases project name')
+    parser.add_argument('--wandb_name', type=str, default=None,
+                       help='Weights & Biases run name')
     return parser.parse_args()
 
 def train(training_args, dataset):   
@@ -36,12 +41,24 @@ def train(training_args, dataset):
 
 if __name__ == "__main__":
     args = parse_args()
+    
+    # Initialize wandb
+    wandb.init(
+        project=args.wandb_project,
+        name=args.wandb_name,
+        config=vars(args)
+    )
+    
     dataset = load_dataset(args.dataset_name, split="train")
     training_args = GRPOConfig(
         output_dir=args.output_dir,
         logging_steps=10,
         num_generations=8,
         push_to_hub=args.push_to_hub,
-        hub_model_id=args.hub_model_id
+        hub_model_id=args.hub_model_id,
+        report_to=["wandb"],  # Enable wandb reporting
     )
     train(training_args, dataset)
+    
+    # Close wandb run
+    wandb.finish()
