@@ -3,6 +3,8 @@ import enchant
 
 def reward_format(completions, **kwargs) -> list[float]:
 
+    completions = [completion[0]["content"] for completion in completions]
+
     # Search for the <think> </think> tags
     pattern = r"<think>(.*?)</think>"
     has_thoughts = [len(re.findall(pattern, completion)) > 0 for completion in completions]
@@ -16,8 +18,10 @@ def reward_format(completions, **kwargs) -> list[float]:
 
 def reward_countdown(completions, reward_data, **kwargs):
 
+    completions = [completion[0]["content"] for completion in completions]
+
     # Get the letters
-    letters = [letters.split(" ") for letters in reward_data["letters"]]
+    letters = [data["letters"].split(" ") for data in reward_data]
     # Extract the answer from the completion
     pattern = r"\\boxed{(.*?)}"
     answers = [re.findall(pattern, completion) for completion in completions]
@@ -50,7 +54,3 @@ def reward_countdown(completions, reward_data, **kwargs):
 
     return scores
 
-if __name__ == "__main__":
-    completions = ["The answer is \\boxed{CAT}.", "The answer is.", "The answer is \\boxed{FISH}."]
-    reward_data = {"letters": ["C A T", "F I S H", "H I S S F"]}
-    print(reward_countdown(completions, reward_data))
