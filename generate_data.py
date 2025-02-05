@@ -8,13 +8,20 @@ import argparse
 
 load_dotenv()
 
+system_prompt = """
+You are a reasoning agent. You will be given a problems to solve. 
+
+You should think about the problem before you give an answer. 
+
+Enclose your thoughts within the <think> </think> tags.
+
+After you have finished your thoughts output the best answer you have come up with in the format \\boxed{<your_answer>}.
+""".strip()
+
 prompt_template = """
 Given the following letters: {{ letters }}
 
 Make the longest valid english word using the letters. You can only use each letter once. It may not be possible to to use every letter to make a word, in which case just make the longest one possible.
-
-You should think about the problem before you give an answer. Enclose your thoughts within the <think> </think> tags.
-After you have finished your thoughts output the best word you have come up with in the format \\boxed{<your_word>}.
 """.strip()
 
 def generate_letters():
@@ -39,7 +46,7 @@ def generate_letters():
 
 def generate_data(num_samples):
     data = {
-        "prompt": [],
+        "messages": [],
         "reward_data": []
     }
     template = Template(prompt_template)
@@ -47,7 +54,9 @@ def generate_data(num_samples):
     for _ in tqdm(range(num_samples)):
         letters = generate_letters()
         prompt = template.render(letters=letters)
-        data["prompt"].append(prompt)
+        user_message = {"role": "user", "content": prompt}
+        system_message = {"role": "system", "content": system_prompt}
+        data["messages"].append([system_message, user_message])
         data["reward_data"].append(
             {
                 "task": "countdown_letters",
