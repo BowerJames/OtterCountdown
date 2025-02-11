@@ -10,11 +10,11 @@ def reward_format(completions, **kwargs) -> list[float]:
     has_thoughts = [len(re.findall(pattern, completion)) > 0 for completion in completions]
 
     # Search for the \\boxed{<your_word>} tags
-    pattern = r"\\boxed{(.*?)}"
+    pattern = r"<answer>(.*?)</answer>"
     has_word = [len(re.findall(pattern, completion)) > 0 for completion in completions]
 
     # Score is 1.0 if both are true, 0.0 otherwise
-    return [int(has_thoughts[i] and has_word[i]) for i in range(len(completions))]
+    return [float(has_thoughts[i] and has_word[i]) for i in range(len(completions))]
 
 def reward_countdown(completions, reward_data, **kwargs):
 
@@ -23,9 +23,9 @@ def reward_countdown(completions, reward_data, **kwargs):
     # Get the letters
     letters = [data["letters"].split(" ") for data in reward_data]
     # Extract the answer from the completion
-    pattern = r"\\boxed{(.*?)}"
+    pattern = r"<answer>(.*?)</answer>"
     answers = [re.findall(pattern, completion) for completion in completions]
-    answers = [answer[0].strip() if len(answer) > 0 else "" for answer in answers]
+    answers = [answer[0].strip().upper() if len(answer) > 0 else "" for answer in answers]
 
     # Check if the answer is a valid english word
     d = enchant.Dict("en_GB")

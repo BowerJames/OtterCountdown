@@ -9,19 +9,15 @@ import argparse
 load_dotenv()
 
 system_prompt = """
-You are a reasoning agent. You will be given a problems to solve. 
+You are a reasoning agent. You will be given a problems to solve.
 
-You should think about the problem before you give an answer. 
-
-Enclose your thoughts within the <think> </think> tags.
-
-After you have finished your thoughts output the best answer you have come up with in the format \\boxed{<your_answer>}.
+You should think about the problem and MUST answer using the following format: <think> <your_thoughts> </think> <answer> <your_answer> </answer>.
 """.strip()
 
 prompt_template = """
 Given the following letters: {{ letters }}
 
-Make the longest valid english word using the letters. You can only use each letter once. It may not be possible to to use every letter to make a word, in which case just make the longest one possible.
+Make the longest valid english word using the letters. You can only use each letter once. It may not be possible to to use every letter to make a word, in which case just make the longest valid word possible.
 """.strip()
 
 def generate_letters():
@@ -30,7 +26,7 @@ def generate_letters():
     consonants = "".join(c for c in string.ascii_uppercase if c not in vowels)
 
     # Determine the number of consonants and vowels
-    num_letters = random.randint(5, 9)
+    num_letters = 9
     num_vowels = random.randint(2, num_letters // 2) # Cap max vowels
     num_consonants = num_letters - num_vowels
 
