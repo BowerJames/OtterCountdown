@@ -21,11 +21,11 @@ def train(script_args: ScriptArgs, model_args: ModelConfig, training_args: Train
 
     dataset = load_dataset(script_args.dataset_name, split="train")
     dataset = dataset.rename_column("messages", "prompts")
-    dataset = dataset.train_test_split(test_size=50)
+    dataset = dataset.train_test_split(test_size=64)
 
     peft_config = get_peft_config(model_args)
 
-    model = AutoModelForCausalLM.from_pretrained(model_args.model_name, load_in_8bit=True, trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, load_in_8bit=model_args.load_in_8bit, trust_remote_code=True)
         
     trainer = GRPOTrainer(
         model=model_args.model_name,
