@@ -37,7 +37,7 @@ def generate_letters():
     consonants = "".join(c for c in string.ascii_uppercase if c not in vowels)
 
     # Determine the number of consonants and vowels
-    num_letters = random.randint(5, 9)
+    num_letters = 9
     num_vowels = random.randint(2, num_letters // 2) # Cap max vowels
     num_consonants = num_letters - num_vowels
 

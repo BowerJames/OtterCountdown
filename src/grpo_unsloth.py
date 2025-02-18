@@ -4,11 +4,7 @@ from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
 from dataclasses import dataclass, asdict
 
-from src.reward_functions import reward_soft_think_open, reward_soft_think_close, reward_soft_answer_open, reward_soft_answer_close, reward_hard_format, reward_countdown_word
-
-@dataclass
-class ScriptArgs:
-    hub_token: str
+from reward_functions import reward_soft_think_open, reward_soft_think_close, reward_soft_answer_open, reward_soft_answer_close, reward_hard_format, reward_countdown_word
 
 @dataclass
 class DatasetArgs:
@@ -19,7 +15,7 @@ class DatasetArgs:
 @dataclass
 class BaseModelConfig:
     model_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
-    max_seq_len: int
+    max_seq_len: int = 2048
     load_in_4bit: bool = True
     fast_inference: bool = True
     gpu_memory_utilization: float = 0.5
@@ -32,11 +28,11 @@ class PeftModelConfig:
     use_gradient_checkpointing: str = "unsloth"
     random_state: int = 42
 
-def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs, script_args: ScriptArgs):
+def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs):
     PatchFastRL("GRPO", FastLanguageModel)
 
-    if script_args.hub_token:
-        login(token=script_args.hub_token)
+    if training_args.hub_token:
+        login(token=training_args.hub_token)
 
     dataset = load_dataset(dataset_args.dataset_name, split=dataset_args.split)
     dataset = dataset.train_test_split(test_size=dataset_args.test_split)
@@ -75,6 +71,8 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
 
 
 if __name__ == "__main__":
-    parser = TrlParser((BaseModelConfig, PeftModelConfig, GRPOConfig, DatasetArgs, ScriptArgs))
-    base_model_args, peft_model_args, training_args, dataset_args, script_args = parser.parse_args_and_config()
+    parser = TrlParser((BaseModelConfig, PeftModelConfig, GRPOConfig, DatasetArgs))
+    base_model_args, peft_model_args, training_args, dataset_args = parser.parse_args_and_config()
+
+    main(base_model_args, peft_model_args, training_args, dataset_args)
     

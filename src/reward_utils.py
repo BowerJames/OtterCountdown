@@ -3,7 +3,8 @@ import re
 
 def is_valid_word(word: str) -> bool:
     """Check if a word is a valid english word."""
-    return enchant.check(word)
+    d = enchant.Dict("en_GB")
+    return d.check(word)
 
 def validate_letters_constraint(word: str, letters: str) -> bool:
     """Check if a word uses the letters constraint."""

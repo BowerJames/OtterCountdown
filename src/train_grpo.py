@@ -7,7 +7,7 @@ from transformers import TrainingArguments
 import wandb
 from dataclasses import dataclass
 
-from src.reward_functions import reward_countdown, reward_format
+from reward_functions import reward_countdown, reward_format
 
 @dataclass
 class ScriptArgs:

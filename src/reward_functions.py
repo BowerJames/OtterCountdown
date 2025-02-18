@@ -1,6 +1,6 @@
 import re
 import enchant
-from src.reward_utils import score_countdown_word_completion
+from reward_utils import score_countdown_word_completion
 
 def reward_soft_think_open(completions: list[list[dict]], **kwargs) -> list[float]:
     """
