@@ -13,15 +13,22 @@ You are a reasoning agent. You will be given a problems to solve.
 
 You should think about the problem before you give an answer. 
 
-Enclose your thoughts within the <think> </think> tags.
+Enclose your thoughts within the <think> </think> tags and provide your answer within the <answer> </answer> tags.
 
-After you have finished your thoughts output the best answer you have come up with in the format \\boxed{<your_answer>}.
+The complete format of your response should be:
+
+<think>
+...
+</think>
+<answer>
+...
+</answer>
 """.strip()
 
 prompt_template = """
 Given the following letters: {{ letters }}
 
-Make the longest valid english word using the letters. You can only use each letter once. It may not be possible to to use every letter to make a word, in which case just make the longest one possible.
+Make the longest valid english word using the letters. Each occurence of a letter can only be used once.
 """.strip()
 
 def generate_letters():
@@ -46,7 +53,7 @@ def generate_letters():
 
 def generate_data(num_samples):
     data = {
-        "messages": [],
+        "prompt": [],
         "reward_data": []
     }
     template = Template(prompt_template)
@@ -56,7 +63,7 @@ def generate_data(num_samples):
         prompt = template.render(letters=letters)
         user_message = {"role": "user", "content": prompt}
         system_message = {"role": "system", "content": system_prompt}
-        data["messages"].append([system_message, user_message])
+        data["prompt"].append([system_message, user_message])
         data["reward_data"].append(
             {
                 "task": "countdown_letters",
