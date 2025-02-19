@@ -4,7 +4,7 @@ from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
 from dataclasses import dataclass, asdict
 
-from reward_functions import reward_soft_think_open, reward_soft_think_close, reward_soft_answer_open, reward_soft_answer_close, reward_hard_format, reward_countdown_word
+from reward_functions import reward_soft_think, reward_soft_answer, reward_hard_format, reward_countdown_word
 
 @dataclass
 class DatasetArgs:
@@ -27,6 +27,7 @@ class PeftModelConfig:
     lora_alpha: float = 16
     use_gradient_checkpointing: str = "unsloth"
     random_state: int = 42
+    use_dora: bool = False
 
 def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs):
     PatchFastRL("GRPO", FastLanguageModel)
@@ -35,9 +36,6 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
         login(token=training_args.hub_token)
 
     dataset = load_dataset(dataset_args.dataset_name, split=dataset_args.split)
-    dataset = dataset.train_test_split(test_size=dataset_args.test_split)
-    train_dataset = dataset["train"]
-    test_dataset = dataset["test"]
 
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=base_model_args.model_name,
@@ -59,9 +57,8 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
 
     trainer = GRPOTrainer(
         model=model,
-        train_dataset=train_dataset,
-        test_dataset=test_dataset,
-        reward_funcs=[reward_soft_think_open, reward_soft_think_close, reward_soft_answer_open, reward_soft_answer_close, reward_hard_format, reward_countdown_word],
+        train_dataset=dataset,
+        reward_funcs=[reward_soft_think, reward_soft_answer, reward_hard_format, reward_countdown_word],
         args=training_args,
     )
 

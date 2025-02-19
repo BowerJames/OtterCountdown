@@ -2,11 +2,11 @@ import re
 import enchant
 from reward_utils import score_countdown_word_completion
 
-def reward_soft_think_open(completions: list[list[dict]], **kwargs) -> list[float]:
+def reward_soft_think(completions: list[list[dict]], **kwargs) -> list[float]:
     """
-    Soft reward for the presence of the <think> tag.
+    Soft reward for the presence of the <think> </think> tags.
 
-    A small reward will be given for the presence of the <think> tag followed by a slight penaltiy for all extra think tags included.
+    A small reward will be given for the presence of the <think> </think> tags.
 
     Input:
         completions: list[list[dict]]
@@ -30,51 +30,17 @@ def reward_soft_think_open(completions: list[list[dict]], **kwargs) -> list[floa
     # Reward the presence of the <think> tag
     presence_reward = 0.25
     extra_tags_penalty = presence_reward / 2
-    pattern = r"<think>"
+    pattern = r"^<think>(.*?)</think>"
     num_tags = [len(re.findall(pattern, completion)) for completion in completions]
     rewards = [rewards[i] + presence_reward - (extra_tags_penalty * (num_tags[i] - 1)) if num_tags[i] > 0 else rewards[i] for i in range(len(completions))]
 
     return rewards
 
-def reward_soft_think_close(completions: list[list[dict]], **kwargs) -> list[float]:
+def reward_soft_answer(completions: list[list[dict]], **kwargs) -> list[float]:
     """
-    Soft reward for the presence of the </think> tag.
+    Soft reward for the presence of the <answer> </answer> tags.
 
-    A small reward will be given for the presence of the </think> tag followed by a slight penaltiy for all extra think tags included.
-
-    Input:
-        completions: list[list[dict]]
-            The completions to reward. The outer list represents each generation, and the inner list represents the messages generated in that generation (the inner list is of length 1). Each dict contains the following keys:
-            - "role": str
-                The role of the completion.
-            - "content": str
-                The content of the completion.
-
-    Output:
-        rewards: list[float]
-            The rewards for each completion.
-    """
-
-    # Select the generated text from the completions
-    completions = [completion[-1]["content"] for completion in completions]
-
-    # Initialize the rewards
-    rewards = [0.0] * len(completions)
-
-    # Reward the presence of the </think> tag
-    presence_reward = 0.25
-    extra_tags_penalty = presence_reward / 2
-    pattern = r"</think>"
-    num_tags = [len(re.findall(pattern, completion)) for completion in completions]
-    rewards = [rewards[i] + presence_reward - (extra_tags_penalty * (num_tags[i] - 1)) if num_tags[i] > 0 else rewards[i] for i in range(len(completions))]
-
-    return rewards
-
-def reward_soft_answer_open(completions: list[list[dict]], **kwargs) -> list[float]:
-    """
-    Soft reward for the presence of the <answer> tag.
-
-    A small reward will be given for the presence of the <answer> tag followed by a slight penaltiy for all extra answer tags included.
+    A small reward will be given for the presence of the <answer> </answer> tags.
 
     Input:
         completions: list[list[dict]]
@@ -98,41 +64,7 @@ def reward_soft_answer_open(completions: list[list[dict]], **kwargs) -> list[flo
     # Reward the presence of the <answer> tag
     presence_reward = 0.25
     extra_tags_penalty = presence_reward / 2
-    pattern = r"<answer>"
-    num_tags = [len(re.findall(pattern, completion)) for completion in completions]
-    rewards = [rewards[i] + presence_reward - (extra_tags_penalty * (num_tags[i] - 1)) if num_tags[i] > 0 else rewards[i] for i in range(len(completions))]
-
-    return rewards
-
-def reward_soft_answer_close(completions: list[list[dict]], **kwargs) -> list[float]:
-    """
-    Soft reward for the presence of the </answer> tag.
-
-    A small reward will be given for the presence of the </answer> tag followed by a slight penaltiy for all extra answer tags included.
-
-    Input:
-        completions: list[list[dict]]
-            The completions to reward. The outer list represents each generation, and the inner list represents the messages generated in that generation (the inner list is of length 1). Each dict contains the following keys:
-            - "role": str
-                The role of the completion.
-            - "content": str
-                The content of the completion.
-
-    Output:
-        rewards: list[float]
-            The rewards for each completion.    
-    """
-
-    # Select the generated text from the completions
-    completions = [completion[-1]["content"] for completion in completions]
-
-    # Initialize the rewards
-    rewards = [0.0] * len(completions)
-
-    # Reward the presence of the </answer> tag
-    presence_reward = 0.25
-    extra_tags_penalty = presence_reward / 2
-    pattern = r"</answer>"
+    pattern = r"<answer>(.*?)</answer>$"
     num_tags = [len(re.findall(pattern, completion)) for completion in completions]
     rewards = [rewards[i] + presence_reward - (extra_tags_penalty * (num_tags[i] - 1)) if num_tags[i] > 0 else rewards[i] for i in range(len(completions))]
 
@@ -166,7 +98,7 @@ def reward_hard_format(completions: list[list[dict]], **kwargs) -> list[float]:
     rewards = [0.0] * len(completions)
     
     # Check if the completion is formatted correctly
-    pattern = r"^<think>\n(.*?)\n</think>\n<answer>\n(.*?)\n</answer>\n$"
+    pattern = r"^<think>\n(.*?)\n</think>\n<answer>\n(.*?)\n</answer>$"
     num_matches = [len(re.findall(pattern, completion)) for completion in completions]
     rewards = [rewards[i] + 1.0 if num_matches[i] > 0 else rewards[i] for i in range(len(completions))]
     
