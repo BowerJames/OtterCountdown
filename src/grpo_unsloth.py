@@ -21,8 +21,8 @@ class BaseModelConfig:
 
 @dataclass
 class PeftModelConfig:
+    target_modules: list[str]
     lora_rank: int = 16
-    target_modules: list[str] = ["q_proj", "k_proj", "v_proj", "o_proj","gate_proj", "up_proj", "down_proj"]
     lora_alpha: float = 16
     use_gradient_checkpointing: str = "unsloth"
     random_state: int = 42
