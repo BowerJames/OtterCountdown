@@ -20,7 +20,7 @@ def validate_letters_constraint(word: str, letters: str) -> bool:
 def extract_answer(completion: str) -> str:
     """Extract the answer from a completion."""
 
-    pattern = r"<answer>\n(.*?)\n</answer>"
+    pattern = r"<answer>(.*?)</answer>"
     match = re.search(pattern, completion)
     if match:
         return match.group(1).strip().upper()
