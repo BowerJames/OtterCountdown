@@ -4,7 +4,7 @@ from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
 from dataclasses import dataclass, asdict
 
-from reward_functions import reward_soft_think, reward_soft_answer, reward_hard_format, reward_countdown_word
+from reward_functions import reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word
 
 @dataclass
 class DatasetArgs:
@@ -58,7 +58,7 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
     trainer = GRPOTrainer(
         model=model,
         train_dataset=dataset,
-        reward_funcs=[reward_soft_think, reward_soft_answer, reward_hard_format, reward_countdown_word],
+        reward_funcs=[reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word],
         args=training_args,
     )
 
