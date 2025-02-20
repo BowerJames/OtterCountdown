@@ -24,7 +24,7 @@ def reward_think(completions: list[list[dict]], **kwargs) -> list[float]:
     completions = [completion[-1]["content"] for completion in completions]
 
     # Reward the presence of the <think> tag
-    pattern = r"^<think>(.*?)</think>"
+    pattern = r"^\n*<think>(.*?)</think>"
     has_think = [bool(re.search(pattern, completion)) for completion in completions]
     rewards = [1.0 if has_think[i] else 0.0 for i in range(len(completions))]
     
@@ -109,7 +109,7 @@ def reward_hard_format(completions: list[list[dict]], **kwargs) -> list[float]:
     completions = [completion[-1]["content"] for completion in completions]
 
     # Check if the completion is formatted correctly
-    pattern = r"^<think>(.*?)</think>\n*<answer>(.*?)</answer>\n*$"
+    pattern = r"^\n*<think>(.*?)</think>\n*<answer>(.*?)</answer>\n*$"
     has_correct_format = [bool(re.search(pattern, completion)) for completion in completions]
     rewards = [1.0 if has_correct_format[i] else 0.0 for i in range(len(completions))]
     
