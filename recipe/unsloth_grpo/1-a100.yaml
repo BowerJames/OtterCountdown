@@ -3,7 +3,6 @@
 # Dataset
 dataset_name: "jimbowyer123/countdown"
 split: "train"
-test_split: 0.01
 
 # Base Model
 model_name: "meta-llama/meta-Llama-3.1-8B-Instruct"
@@ -35,7 +34,7 @@ gradient_accumulation_steps: 2
 learning_rate: 2.0e-5
 adam_beta1: 0.9
 adam_beta2: 0.999
-warmup_steps: 10
+warmup_steps: 0
 lr_scheduler_type: cosine
 optim: "paged_adamw_8bit"
 logging_steps: 1
@@ -43,13 +42,11 @@ bf16: true
 fp16: false
 max_prompt_length: 256
 max_completion_length: 1024
-max_steps: 200
-eval_steps: 200
+max_steps: -1
 num_train_epochs: 1
 max_grad_norm: 1.0
 output_dir: "unsloth_grpo"
 overwrite_output_dir: true
-push_to_hub: false
 report_to:
   - "wandb"
 seed: 42

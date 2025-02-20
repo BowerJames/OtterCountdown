@@ -10,7 +10,6 @@ from reward_functions import reward_think, reward_answer, reward_think_answer, r
 class DatasetArgs:
     dataset_name: str
     split: str = "train"
-    test_split: float = 0.01
 
 @dataclass
 class BaseModelConfig:
@@ -53,6 +52,7 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
         lora_alpha=peft_model_args.lora_alpha,
         use_gradient_checkpointing=peft_model_args.use_gradient_checkpointing,
         random_state=peft_model_args.random_state,
+        use_dora=peft_model_args.use_dora,
     )
 
     trainer = GRPOTrainer(
