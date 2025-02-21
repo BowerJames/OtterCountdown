@@ -8,27 +8,10 @@ import argparse
 
 load_dotenv()
 
-system_prompt = """
-You are a reasoning agent. You will be given a problems to solve. 
-
-You should think about the problem before you give an answer. 
-
-Enclose your thoughts within the <think> </think> tags and provide your answer within the <answer> </answer> tags.
-
-The complete format of your response should be:
-
-<think>
-...
-</think>
-<answer>
-...
-</answer>
-""".strip()
-
 prompt_template = """
 Given the following letters: {{ letters }}
 
-Make the longest valid english word using the letters. Each occurence of a letter can only be used once.
+Make the longest valid english word using the letters provided. You cannot use a letter more times than it appears in the list.
 """.strip()
 
 def generate_letters():
@@ -61,9 +44,8 @@ def generate_data(num_samples):
     for _ in tqdm(range(num_samples)):
         letters = generate_letters()
         prompt = template.render(letters=letters)
-        user_message = {"role": "user", "content": prompt}
-        system_message = {"role": "system", "content": system_prompt}
-        data["prompt"].append([system_message, user_message])
+        user_message = [{"role": "user", "content": prompt}]
+        data["prompt"].append(user_message)
         data["reward_data"].append(
             {
                 "task": "countdown_letters",
@@ -77,15 +59,16 @@ def generate_data(num_samples):
 
 if __name__ == "__main__":
     from huggingface_hub import login
-    import os
 
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Generate countdown letter game data')
     parser.add_argument('-n', '--num-samples', type=int, required=True,
                       help='Number of samples to generate')
+    parser.add_argument("--hub-token", type=str, required=True,
+                      help="Hugging Face token")
     args = parser.parse_args()
 
-    login(os.getenv("HF_TOKEN"))
+    login(token=args.hub_token)
 
     dataset = generate_data(args.num_samples)
 

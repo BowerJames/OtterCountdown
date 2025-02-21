@@ -1,5 +1,5 @@
 from unsloth import FastLanguageModel, PatchFastRL
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
 from dataclasses import dataclass, asdict
@@ -10,6 +10,7 @@ from reward_functions import reward_think, reward_answer, reward_think_answer, r
 class DatasetArgs:
     dataset_name: str
     split: str = "train"
+    system_prompt: str | None = "You are a reasoning agent. You will be given a problem to solve.\n\nYou should think about the problem before you give an answer.\n\nEnclose your thoughts within the <think> </think> tags and provide your answer within the <answer> </answer> tags.\n\nThe complete format of your response should be:\n\n<think>\n...\n</think>\n<answer>\n...\n</answer>"
 
 @dataclass
 class BaseModelConfig:
@@ -28,13 +29,37 @@ class PeftModelConfig:
     random_state: int = 42
     use_dora: bool = False
 
+def get_dataset(dataset_args: DatasetArgs) -> Dataset:
+    dataset = load_dataset(dataset_args.dataset_name, split=dataset_args.split)
+
+    def map_to_conversation(example):
+        prompt = example["prompt"]
+        if isinstance(prompt, str):
+            prompt = [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        if dataset_args.system_prompt:
+            prompt.insert(0, {
+                "role": "system",
+                "content": dataset_args.system_prompt
+            })
+
+        example["prompt"] = prompt
+        return example
+    
+    dataset = dataset.map(map_to_conversation)
+    return dataset
+
 def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs):
     PatchFastRL("GRPO", FastLanguageModel)
 
     if training_args.hub_token:
         login(token=training_args.hub_token)
 
-    dataset = load_dataset(dataset_args.dataset_name, split=dataset_args.split)
+    dataset = get_dataset(dataset_args)
 
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=base_model_args.model_name,
@@ -57,6 +82,7 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
 
     trainer = GRPOTrainer(
         model=model,
+        processing_class=tokenizer,
         train_dataset=dataset,
         reward_funcs=[reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word],
         args=training_args,

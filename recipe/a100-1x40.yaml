@@ -3,16 +3,17 @@
 # Dataset
 dataset_name: "jimbowyer123/countdown"
 split: "train"
+system_prompt: "You are a reasoning agent. You will be given a problem to solve.\n\nYou should think about the problem before you give an answer.\n\nEnclose your thoughts within the <think> </think> tags and provide your answer within the <answer> </answer> tags.\n\nThe complete format of your response should be:\n\n<think>\n...\n</think>\n<answer>\n...\n</answer>"
 
 # Base Model
-model_name: "meta-llama/meta-Llama-3.1-8B-Instruct"
+model_name: "unsloth/Qwen2.5-7B"
 max_seq_len: 2048
 load_in_4bit: true
 fast_inference: true
 gpu_memory_utilization: 0.5
 
 # Peft Model
-lora_rank: 16
+lora_rank: 32
 target_modules:
   - "q_proj"
   - "k_proj"
@@ -21,20 +22,21 @@ target_modules:
   - "gate_proj"
   - "up_proj"
   - "down_proj"
-lora_alpha: 16
+lora_alpha: 32
 use_gradient_checkpointing: "unsloth"
 random_state: 42
 use_dora: false
 
-# Trainign Args
+# Training Args
+beta: 0.01
 use_vllm: true
 per_device_train_batch_size: 1
 num_generations: 16
-gradient_accumulation_steps: 2
-learning_rate: 2.0e-5
+gradient_accumulation_steps: 4
+learning_rate: 2.5e-7
 adam_beta1: 0.9
 adam_beta2: 0.999
-warmup_steps: 0
+warmup_steps: 100
 lr_scheduler_type: cosine
 optim: "paged_adamw_8bit"
 logging_steps: 1
@@ -44,7 +46,7 @@ max_prompt_length: 256
 max_completion_length: 1024
 max_steps: -1
 num_train_epochs: 1
-max_grad_norm: 1.0
+max_grad_norm: 0.1
 output_dir: "unsloth_grpo"
 overwrite_output_dir: true
 report_to:
