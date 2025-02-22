@@ -86,4 +86,8 @@ Finally, login to wandb:
 wandb login
 ```
 
-Now you are good to go.
+Now launch the training script:
+
+```bash
+python src/grpo_unsloth.py --config recipe/a100-1x40.yaml --hub-token <your-huggingface-token>
+```
