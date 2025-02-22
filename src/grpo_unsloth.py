@@ -69,6 +69,7 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
         max_lora_rank=peft_model_args.lora_rank,
         gpu_memory_utilization=base_model_args.gpu_memory_utilization,
     )
+    tokenizer.pad_token = tokenizer.eos_token
 
     model = FastLanguageModel.get_peft_model(
         model,
