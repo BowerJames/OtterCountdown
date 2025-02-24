@@ -1,4 +1,4 @@
-from unsloth import FastLanguageModel, PatchFastRL
+from unsloth import FastLanguageModel
 from datasets import load_dataset, Dataset
 from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
@@ -55,7 +55,6 @@ def get_dataset(dataset_args: DatasetArgs) -> Dataset:
     return dataset
 
 def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs):
-    PatchFastRL("GRPO", FastLanguageModel)
 
     if training_args.hub_token:
         login(token=training_args.hub_token)
