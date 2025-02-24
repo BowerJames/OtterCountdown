@@ -6,7 +6,8 @@ split: "train"
 system_prompt: "You are a reasoning agent. You will be given a problem to solve.\n\nYou should think about the problem before you give an answer.\n\nEnclose your thoughts within the <think> </think> tags and provide your answer within the <answer> </answer> tags.\n\nThe complete format of your response should be:\n\n<think>\n...\n</think>\n<answer>\n...\n</answer>"
 
 # Base Model
-model_name: "unsloth/Qwen2.5-7B"
+model_name: "Qwen/Qwen2.5-7B"
+tokenizer_name: "Qwen/Qwen2.5-7B-Instruct"
 max_seq_len: 2048
 load_in_4bit: true
 fast_inference: true

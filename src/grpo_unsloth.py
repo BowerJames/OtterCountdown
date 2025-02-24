@@ -3,6 +3,7 @@ from datasets import load_dataset, Dataset
 from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
 from dataclasses import dataclass, asdict
+from transformers import AutoTokenizer
 
 from reward_functions import reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word
 
@@ -69,6 +70,7 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
         max_lora_rank=peft_model_args.lora_rank,
         gpu_memory_utilization=base_model_args.gpu_memory_utilization,
     )
+    tokenizer = AutoTokenizer.from_pretrained(base_model_args.tokenizer_name)
     tokenizer.pad_token = tokenizer.eos_token
 
     model = FastLanguageModel.get_peft_model(
