@@ -16,6 +16,7 @@ class DatasetArgs:
 @dataclass
 class BaseModelConfig:
     model_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
+    tokenizer_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
     max_seq_len: int = 2048
     load_in_4bit: bool = True
     fast_inference: bool = True

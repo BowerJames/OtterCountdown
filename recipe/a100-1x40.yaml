@@ -8,7 +8,7 @@ system_prompt: "You are a reasoning agent. You will be given a problem to solve.
 # Base Model
 model_name: "Qwen/Qwen2.5-7B"
 tokenizer_name: "Qwen/Qwen2.5-7B-Instruct"
-max_seq_len: 2048
+max_seq_len: 1536
 load_in_4bit: true
 fast_inference: true
 gpu_memory_utilization: 0.5
@@ -37,7 +37,7 @@ gradient_accumulation_steps: 4
 learning_rate: 2.5e-7
 adam_beta1: 0.9
 adam_beta2: 0.999
-warmup_steps: 100
+warmup_steps: 50
 lr_scheduler_type: cosine
 optim: "paged_adamw_8bit"
 logging_steps: 1
