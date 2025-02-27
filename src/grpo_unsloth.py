@@ -4,6 +4,7 @@ from trl import GRPOConfig, GRPOTrainer, TrlParser, ModelConfig
 from huggingface_hub import login
 from dataclasses import dataclass, asdict
 from transformers import AutoTokenizer
+import logging
 
 from reward_functions import reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word
 
@@ -17,10 +18,10 @@ class DatasetArgs:
 class BaseModelConfig:
     model_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
     tokenizer_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
-    max_seq_len: int = 2048
+    max_seq_len: int | None = None
     load_in_4bit: bool = True
     fast_inference: bool = True
-    gpu_memory_utilization: float = 0.5
+    gpu_memory_utilization: float | None = None
 
 @dataclass
 class PeftModelConfig:
@@ -92,13 +93,17 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
     )
 
     trainer.train()
-    
-    
-
 
 if __name__ == "__main__":
     parser = TrlParser((BaseModelConfig, PeftModelConfig, GRPOConfig, DatasetArgs))
     base_model_args, peft_model_args, training_args, dataset_args = parser.parse_args_and_config()
+    training_args.use_vllm = base_model_args.fast_inference
+
+    logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level="DEBUG")
+    
+    if training_args.use_vllm != base_model_args.fast_inference:
+        logging.info(f"use_vllm is set to {training_args.use_vllm} but fast_inference is set to {base_model_args.fast_inference}. Overriding use_vllm with fast_inference.")
+        training_args.use_vllm = base_model_args.fast_inference
 
     main(base_model_args, peft_model_args, training_args, dataset_args)
     
