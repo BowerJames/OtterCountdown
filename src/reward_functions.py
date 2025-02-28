@@ -1,6 +1,6 @@
 import re
 import enchant
-from reward_utils import score_countdown_word_completion, think_format_score, think_answer_format_score, answer_format_score, hard_format_score, create_clipped_reward
+from reward_utils import countdown_word_completion_score, think_format_score, think_answer_format_score, answer_format_score, hard_format_score, create_clipped_reward
 import numpy as np
 
 def reward_think(completions: list[list[dict]], **kwargs) -> list[float]:
@@ -127,11 +127,11 @@ def reward_countdown_word(completions: list[dict], reward_data: list[dict], **kw
 
     completions = [completion[0]["content"] for completion in completions]
 
-    rewards = [score_countdown_word_completion(completion, data["letters"]) if data["task"] == "countdown_letters" else 0.0 for completion, data in zip(completions, reward_data)]
+    rewards = [countdown_word_completion_score(completion, data["letters"]) if data["task"] == "countdown_letters" else 0.0 for completion, data in zip(completions, reward_data)]
 
     return rewards
 
-def reward_global(completions: list[list[dict]], **kwargs) -> list[float]:
+def reward_global(completions: list[list[dict]], reward_data: list[dict], **kwargs) -> list[float]:
     """
     Global reward function for training the model.
     """
@@ -139,11 +139,14 @@ def reward_global(completions: list[list[dict]], **kwargs) -> list[float]:
     
     rewards = [0.0] * len(completions)
 
-    for i, completion in enumerate(completions):
+
+
+    for i, (completion, data) in enumerate(zip(completions, reward_data)):
         rewards[i] += think_format_score(completion)
         rewards[i] += think_answer_format_score(completion)
         rewards[i] += answer_format_score(completion)
         rewards[i] += hard_format_score(completion)
+        rewards[i] += countdown_word_completion_score(completion, data["letters"]) if data["task"] == "countdown_letters" else 0.0
 
     rewards = create_clipped_reward(rewards)
 

@@ -28,7 +28,7 @@ def extract_answer(completion: str) -> str:
     else:
         return ""
     
-def score_countdown_word_completion(completion: str, letters: str) -> float:
+def countdown_word_completion_score(completion: str, letters: str) -> float:
     """Score a countdown word completion."""
     answer = extract_answer(completion)
     if not answer:
@@ -37,7 +37,7 @@ def score_countdown_word_completion(completion: str, letters: str) -> float:
         return 0.0
     if not validate_letters_constraint(answer, letters):
         return 0.0
-    return float(len(answer))
+    return float(len(answer)) / 9
 
 def think_format_score(completion: str) -> float:
     """Score for the presence of the <think> tag."""
