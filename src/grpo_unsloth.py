@@ -6,7 +6,7 @@ from dataclasses import dataclass, asdict
 from transformers import AutoTokenizer
 import logging
 
-from reward_functions import reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word
+from reward_functions import REWARD_FUNCTIONS
 
 @dataclass
 class DatasetArgs:
@@ -32,6 +32,10 @@ class PeftModelConfig:
     random_state: int = 42
     use_dora: bool = False
 
+@dataclass
+class TrainerConfig:
+    reward_funcs: list[str]
+
 def get_dataset(dataset_args: DatasetArgs) -> Dataset:
     dataset = load_dataset(dataset_args.dataset_name, split=dataset_args.split)
 
@@ -56,7 +60,7 @@ def get_dataset(dataset_args: DatasetArgs) -> Dataset:
     dataset = dataset.map(map_to_conversation)
     return dataset
 
-def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs):
+def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, training_args: GRPOConfig, dataset_args: DatasetArgs, trainer_args: TrainerConfig):
 
     if training_args.hub_token:
         login(token=training_args.hub_token)
@@ -84,19 +88,21 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
         use_dora=peft_model_args.use_dora,
     )
 
+    reward_funcs = [REWARD_FUNCTIONS[func] for func in trainer_args.reward_funcs]
+
     trainer = GRPOTrainer(
         model=model,
         processing_class=tokenizer,
         train_dataset=dataset,
-        reward_funcs=[reward_think, reward_answer, reward_think_answer, reward_hard_format, reward_countdown_word],
+        reward_funcs=reward_funcs,
         args=training_args,
     )
 
     trainer.train()
 
 if __name__ == "__main__":
-    parser = TrlParser((BaseModelConfig, PeftModelConfig, GRPOConfig, DatasetArgs))
-    base_model_args, peft_model_args, training_args, dataset_args = parser.parse_args_and_config()
+    parser = TrlParser((BaseModelConfig, PeftModelConfig, GRPOConfig, DatasetArgs, TrainerConfig))
+    base_model_args, peft_model_args, training_args, dataset_args, trainer_args = parser.parse_args_and_config()
     training_args.use_vllm = base_model_args.fast_inference
 
     logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level="INFO")
@@ -105,5 +111,5 @@ if __name__ == "__main__":
         logging.info(f"use_vllm is set to {training_args.use_vllm} but fast_inference is set to {base_model_args.fast_inference}. Overriding use_vllm with fast_inference.")
         training_args.use_vllm = base_model_args.fast_inference
 
-    main(base_model_args, peft_model_args, training_args, dataset_args)
+    main(base_model_args, peft_model_args, training_args, dataset_args, trainer_args)
     
