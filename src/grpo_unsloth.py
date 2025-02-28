@@ -99,7 +99,7 @@ if __name__ == "__main__":
     base_model_args, peft_model_args, training_args, dataset_args = parser.parse_args_and_config()
     training_args.use_vllm = base_model_args.fast_inference
 
-    logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level="DEBUG")
+    logging.basicConfig(format="%(levelname)s - %(name)s -  %(message)s", level="INFO")
     
     if training_args.use_vllm != base_model_args.fast_inference:
         logging.info(f"use_vllm is set to {training_args.use_vllm} but fast_inference is set to {base_model_args.fast_inference}. Overriding use_vllm with fast_inference.")

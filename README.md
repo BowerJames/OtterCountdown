@@ -8,6 +8,14 @@ This project is a simple implementation of a countdown solver using a LLM.
 
 ### Lambda Labs (UNSLOTH)
 
+### Initial Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/BowerJames/OtterCountdown.git
+```
+
 Create a python environment:
 
 ```bash
@@ -32,7 +40,21 @@ Install fsspec compatible with huggign face datasets library:
 python -m pip install fsspec[http]==2024.9.0
 ```
 
-Now build vllm:
+Install enchant-2:
+
+```bash
+sudo apt install enchant-2
+```
+
+Now we can install the remaining dependencies:
+
+```bash
+python -m pip install pyenchant wandb
+```
+
+### VLLM (Optional)
+
+If you plan to use vllm for generation, you can install it from source with (this step may take 10 - 20 mins):
 
 ```bash
 git clone -b v0.7.2 https://github.com/vllm-project/vllm.git
@@ -46,19 +68,7 @@ cd vllm && python use_existing_torch.py
 python -m pip install -r requirements-build.txt && python -m pip install -e . --no-build-isolation
 ```
 
-This step may take 10 - 20 mins.
-
-Before we can install the remaining dependencies, we need to install the Enchant C library:
-
-```bash
-sudo apt install enchant-2
-```
-
-Now we can install the remaining dependencies:
-
-```bash
-python -m pip install pyenchant wandb
-```
+### Final Steps
 
 Finally, login to wandb:
 
@@ -66,8 +76,8 @@ Finally, login to wandb:
 wandb login
 ```
 
-Now launch the training script:
+CD into the repository and launch the training script with your huggingface token:
 
 ```bash
-python src/grpo_unsloth.py --config recipe/a100-1x40.yaml --hub-token <your-huggingface-token>
+cd OtterCountdown && python src/grpo_unsloth.py --config recipe/a100-1x40.yaml --hub-token <your-huggingface-token>
 ```
