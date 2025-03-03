@@ -11,7 +11,7 @@ load_dotenv()
 prompt_template = """
 Given the following letters: {{ letters }}
 
-Make the longest valid english word using the letters provided. You cannot use a letter more times than it appears in the list.
+Make a word that can be found in the english dictionary. The longer the word the better your score. You cannot use a letter more times than it appears in the list.
 """.strip()
 
 def generate_letters():
@@ -32,7 +32,7 @@ def generate_letters():
     letters = chosen_consonants + chosen_vowels
     random.shuffle(letters)
 
-    return " ".join(letters)
+    return " ".join(letters).lower()
 
 def generate_data(num_samples):
     data = {

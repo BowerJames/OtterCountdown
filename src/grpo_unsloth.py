@@ -17,7 +17,7 @@ class DatasetArgs:
 @dataclass
 class BaseModelConfig:
     model_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
-    tokenizer_name: str = "meta-llama/meta-Llama-3.1-8B-Instruct"
+    tokenizer_name: str | None = None
     max_seq_len: int | None = None
     load_in_4bit: bool = True
     fast_inference: bool = True
@@ -75,8 +75,12 @@ def main(base_model_args: BaseModelConfig, peft_model_args: PeftModelConfig, tra
         max_lora_rank=peft_model_args.lora_rank,
         gpu_memory_utilization=base_model_args.gpu_memory_utilization,
     )
-    tokenizer = AutoTokenizer.from_pretrained(base_model_args.tokenizer_name)
-    tokenizer.pad_token = tokenizer.eos_token
+
+    if base_model_args.tokenizer_name:  
+        tokenizer = AutoTokenizer.from_pretrained(base_model_args.tokenizer_name)
+        tokenizer.pad_token = tokenizer.eos_token
+    else:
+        tokenizer = tokenizer
 
     model = FastLanguageModel.get_peft_model(
         model,
