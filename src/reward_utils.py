@@ -21,7 +21,7 @@ def validate_letters_constraint(word: str, letters: str) -> bool:
 def extract_answer(completion: str) -> str:
     """Extract the answer from a completion."""
 
-    pattern = r"<answer>((.|\n)*)</answer>"
+    pattern = r"<answer>(.|\n)*</answer>"
     match = re.search(pattern, completion)
     if match:
         return match.group(1).strip().upper()
@@ -42,27 +42,27 @@ def countdown_word_completion_score(completion: str, letters: str) -> float:
 def think_format_score(completion: str) -> float:
     """Score for the presence of the <think> tag."""
 
-    pattern = r"^\n*<think>((.|\n)*)</think>"
+    pattern = r"^\n*<think>(.|\n)*</think>"
     has_think = bool(re.search(pattern, completion))
-    return 1.0 if has_think else 0.0
+    return 0.25 if has_think else 0.0
     
 def think_answer_format_score(completion: str) -> float:
     """Reward for the presence of the </think> and <answer> tags."""
-    pattern = r"^\n*<think>((.|\n)*)</think>\n*<answer>((.|\n)*)</answer>"
+    pattern = r"</think>(.|\n)*<answer>"
     has_think_answer = bool(re.search(pattern, completion))
-    return 1.0 if has_think_answer else 0.0
+    return 0.25 if has_think_answer else 0.0
 
 def answer_format_score(completion: str) -> float:
     """Reward for the presence of the <answer> tag."""
-    pattern = r"<answer>((.|\n)*)</answer>\n*$"
+    pattern = r"<answer>(.|\n)*</answer>\n*$"
     has_answer = bool(re.search(pattern, completion))
-    return 1.0 if has_answer else 0.0
+    return 0.25 if has_answer else 0.0
 
 def hard_format_score(completion: str) -> float:
     """Reward for the presence of the <think> and <answer> tags."""
-    pattern = r"^\n*<think>((.|\n)*)</think>\n*<answer>((.|\n)*)</answer>"
+    pattern = r"^\n*<think>(.|\n)*</think>\n*<answer>(.|\n)*</answer>\n*$"
     has_think_answer = bool(re.search(pattern, completion))
-    return 1.0 if has_think_answer else 0.0
+    return 0.25 if has_think_answer else 0.0
 
 def create_clipped_reward(rewards: list[float]) -> list[float]:
     """Function that takes a list of floats and returns a list of floats such that the mean is the same but all values above the mean have the same value, all values below the mean have the same value and values equal to the mean have the value of the mean."""

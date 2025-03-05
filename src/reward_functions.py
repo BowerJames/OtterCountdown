@@ -53,9 +53,7 @@ def reward_answer(completions: list[list[dict]], **kwargs) -> list[float]:
     completions = [completion[-1]["content"] for completion in completions]
 
     # Reward the presence of the <answer> tag
-    pattern = r"<answer>((.|\n)*)</answer>\n*$"
-    has_answer = [bool(re.search(pattern, completion)) for completion in completions]
-    rewards = [1.0 if has_answer[i] else 0.0 for i in range(len(completions))]
+    rewards = [answer_format_score(completion) for completion in completions]
 
     return rewards
 
@@ -77,12 +75,11 @@ def reward_think_answer(completions: list[list[dict]], **kwargs) -> list[float]:
         rewards: list[float]
             The rewards for each completion.
     """
-
+    # Select the generated text from the completions
     completions = [completion[-1]["content"] for completion in completions]
 
-    pattern = r"</think>\n*<answer>"
-    has_think_answer = [bool(re.search(pattern, completion)) for completion in completions]
-    rewards = [1.0 if has_think_answer[i] else 0.0 for i in range(len(completions))]
+    # Reward the presence of the </think> and <answer> tags 
+    rewards = [think_answer_format_score(completion) for completion in completions]
 
     return rewards
 
@@ -110,9 +107,7 @@ def reward_hard_format(completions: list[list[dict]], **kwargs) -> list[float]:
     completions = [completion[-1]["content"] for completion in completions]
 
     # Check if the completion is formatted correctly
-    pattern = r"^\n*<think>((.|\n)*)</think>\n*<answer>((.|\n)*)</answer>\n*$"
-    has_correct_format = [bool(re.search(pattern, completion)) for completion in completions]
-    rewards = [1.0 if has_correct_format[i] else 0.0 for i in range(len(completions))]
+    rewards = [hard_format_score(completion) for completion in completions]
     
     return rewards
 
