@@ -11,7 +11,7 @@ load_dotenv()
 prompt_template = """
 Given the following letters: {{ letters }}
 
-Make a word that can be found in the english dictionary. The longer the word the better your score. You cannot use a letter more times than it appears in the list.
+Make a word that can be found in the english dictionary. You cannot use a letter more times than it appears in the list.
 """.strip()
 
 def generate_letters():

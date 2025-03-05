@@ -10,6 +10,8 @@ def is_valid_word(word: str) -> bool:
 def validate_letters_constraint(word: str, letters: str) -> bool:
     """Check if a word uses the letters constraint."""
     valid = True
+    word = word.upper()
+    letters = letters.upper()
     letters = letters.split(" ")
     for letter in word:
         if letter not in letters:
@@ -33,11 +35,12 @@ def countdown_word_completion_score(completion: str, letters: str) -> float:
     answer = extract_answer(completion)
     if not answer:
         return 0.0
-    if not is_valid_word(answer):
+    elif not is_valid_word(answer):
         return 0.0
-    if not validate_letters_constraint(answer, letters):
+    elif not validate_letters_constraint(answer, letters):
         return 0.0
-    return float(len(answer)) / 9
+    else:
+        return float(len(answer)) / 9
 
 def think_format_score(completion: str) -> float:
     """Score for the presence of the <think> tag."""

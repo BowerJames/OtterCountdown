@@ -6,15 +6,15 @@ split: "train"
 system_prompt: "You are a reasoning agent. You will be given a problem to solve.\n\nYou should think about the problem before you give an answer.\n\nEnclose your thoughts within the <think> </think> tags and provide your answer within the <answer> </answer> tags.\n\nThe complete format of your response should be:\n\n<think>\n...\n</think>\n<answer>\n...\n</answer>"
 
 # Base Model
-model_name: "Qwen/Qwen2.5-7B"
-tokenizer_name: "Qwen/Qwen2.5-7B-Instruct"
-max_seq_len: 1536
+model_name: "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit"
+tokenizer_name: "unsloth/Qwen2.5-1.5B-Instruct-bnb-4bit"
+max_seq_len: 1024
 load_in_4bit: true
 fast_inference: true
-gpu_memory_utilization: 0.5
+gpu_memory_utilization: 0.25
 
 # Peft Model
-lora_rank: 32
+lora_rank: 16
 target_modules:
   - "q_proj"
   - "k_proj"
@@ -23,17 +23,17 @@ target_modules:
   - "gate_proj"
   - "up_proj"
   - "down_proj"
-lora_alpha: 32
+lora_alpha: 16
 use_gradient_checkpointing: "unsloth"
 random_state: 42
 use_dora: false
 
 # Training Args
-beta: 0.04
+beta: 0.01
 use_vllm: true
-per_device_train_batch_size: 1
+per_device_train_batch_size: 16
 num_generations: 16
-gradient_accumulation_steps: 4
+gradient_accumulation_steps: 8
 learning_rate: 1.0e-6
 adam_beta1: 0.9
 adam_beta2: 0.999
@@ -44,7 +44,7 @@ logging_steps: 1
 bf16: true
 fp16: false
 max_prompt_length: 256
-max_completion_length: 1024
+max_completion_length: 768
 max_steps: -1
 num_train_epochs: 1
 max_grad_norm: 0.1
@@ -61,6 +61,10 @@ log_completions: true
 
 # Trainer
 reward_funcs:
-  - "reward_global"
+  - "reward_think"
+  - "reward_answer"
+  - "reward_think_answer"
+  - "reward_hard_format"
+  - "reward_countdown_word"
 
 
